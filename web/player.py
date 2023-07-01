@@ -10,4 +10,4 @@ def index():
 
 @movie_bp.route("/media/videos/<string:file_name>")
 def return_manifest(file_name):
-    return send_file(f'../media/videos/tmp/{file_name}')
+    return send_file(f'../media/videos/hi/{file_name}')

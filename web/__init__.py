@@ -9,10 +9,11 @@ db = SQLAlchemy()
 migrate = Migrate()
 flask_bcrypt = Bcrypt()
 template_dir = os.path.abspath('templates/')
+static_dir = os.path.abspath('templates/static')
 
 
 def create_app():
-    app = Flask(__name__, template_folder=template_dir)
+    app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
     app.config.from_mapping(
         DEBUG=True,
         SQLALCHEMY_DATABASE_URI='sqlite:///../app.db',
