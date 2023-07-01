@@ -1,0 +1,33 @@
+from utils.base_validators import StringFieldValidator
+
+
+class ValidatorUsername(StringFieldValidator):
+    def __init__(self, input_data, ):
+        super(ValidatorUsername, self).__init__(input_data=input_data, is_required=True,
+                                                regex=r'^[a-zA-Z0-9_-]{3,20}$',
+                                                min_length=3, max_length=30)
+
+
+class ValidatorEmail(StringFieldValidator):
+    def __init__(self, input_data):
+        super(ValidatorEmail, self).__init__(input_data=input_data, is_required=True,
+                                             regex=r'^[\w\.-]+@[\w\.-]+\.\w+$',
+                                             min_length=3, max_length=100)
+
+
+class ValidatorPassword(StringFieldValidator):
+    def __init__(self, input_data):
+        super(ValidatorPassword, self).__init__(input_data=input_data, is_required=True,
+                                                min_length=6, max_length=50)
+
+
+class ValidateFirstName(StringFieldValidator):
+    def __init__(self, input_data):
+        super(ValidateFirstName, self).__init__(input_data=input_data, is_required=False,
+                                                min_length=3, max_length=200)
+
+
+class ValidateLastName(StringFieldValidator):
+    def __init__(self, input_data):
+        super(ValidateLastName, self).__init__(input_data=input_data, is_required=False,
+                                               min_length=3, max_length=200)
