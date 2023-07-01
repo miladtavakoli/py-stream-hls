@@ -24,7 +24,7 @@ def create_app():
     flask_bcrypt.init_app(app)
 
     from web.auth import auth_bp
-    from web.representive import movie_bp
+    from web.player import movie_bp
     from repository.user import User, Permission
     app.register_blueprint(auth_bp)
     app.register_blueprint(movie_bp)
