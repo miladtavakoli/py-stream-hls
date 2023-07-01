@@ -10,11 +10,11 @@ class CreateUser:
         has_error = False
         try:
             u = User()
-            u.username = self.validator.username.validated_value()
-            u.email = self.validator.email.validated_value()
-            u.password = self.validator.password.validated_value()
-            u.first_name = self.validator.first_name.validated_value()
-            u.last_name = self.validator.last_name.validated_value()
+            u.username = self.validator.username.validated_value
+            u.email = self.validator.email.validated_value
+            u.password = self.validator.password.validated_value
+            u.first_name = self.validator.first_name.validated_value
+            u.last_name = self.validator.last_name.validated_value
             u.save()
             result = u
         except Exception as e:
@@ -22,7 +22,7 @@ class CreateUser:
             result = User
         return has_error, result
 
-    def run(self) -> list[bool, User | dict | None]:
+    def run(self) -> tuple[bool, User | dict | None]:
         if not self.validator.is_valid:
             has_error = True
             result = self.validator.errors

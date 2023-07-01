@@ -26,9 +26,12 @@ def create_app():
 
     from web.auth import auth_bp
     from web.player import movie_bp
+    from web.panel import panel_bp
     from repository.user import User, Permission
+    from repository.file import Movie
     app.register_blueprint(auth_bp)
     app.register_blueprint(movie_bp)
+    app.register_blueprint(panel_bp)
 
     return app
 

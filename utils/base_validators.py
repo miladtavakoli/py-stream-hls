@@ -1,7 +1,9 @@
 import re
+import os
+import mimetypes
 from abc import ABC, abstractmethod
-
-from utils.exceptions import ValidationException
+from werkzeug.datastructures import FileStorage
+from utils.helper import splitext
 
 
 class BaseFieldValidator(ABC):
@@ -46,6 +48,7 @@ class BaseFieldValidator(ABC):
         """
         return self._errors if self._is_valid is False else None
 
+    @property
     def validated_value(self):
         if self.is_valid:
             return self.input_data
@@ -95,3 +98,43 @@ class StringFieldValidator(BaseFieldValidator):
             if callable(getattr(self, method)) and method.endswith('_validate'):
                 getattr(self, method)()
         return self.input_data
+
+
+class FileFieldValidator(BaseFieldValidator):
+    """
+    Class Variable:
+        regex_pattern (str) : Optional. Checks pattern of field input. Example:  r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        min_length (int) : Optional. Checks minimum length of field input. Example: 3
+        maximum_length (str) : Optional. Checks maximum_length of field input. Example: 25
+    """
+
+    def __init__(self, input_data,
+                 is_required=False,
+                 allowed_mime_types: list[str] = None):
+        self.allowed_mime_types = allowed_mime_types
+        self.regex = allowed_mime_types
+        super().__init__(input_data=input_data, is_required=is_required)
+
+    def mime_types_validate(self):
+        if isinstance(self.input_data, FileStorage):
+            file_type = mimetypes.guess_type(self.input_data.filename)[0]
+            if self.allowed_mime_types is not None and file_type not in self.allowed_mime_types:
+                self._is_valid = False
+                self._errors.append(f"This file type {file_type} is not valid.")
+
+    def validate(self):
+        if not isinstance(self.input_data, FileStorage) and (not self.is_required and self.input_data is not None):
+            self._is_valid = False
+            self._errors.append("This is not valid file.")
+
+        for method in dir(self):
+            if callable(getattr(self, method)) and method.endswith('_validate'):
+                getattr(self, method)()
+        return self.input_data
+
+    @property
+    def file_extension(self):
+        if self.is_valid:
+            _, file_extension = splitext(self.input_data.filename)
+            return file_extension
+        return None
