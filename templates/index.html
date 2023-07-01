@@ -241,7 +241,7 @@
          * Modifications to requests that will affect every player.
          */
 
-        let newUri = options.uri.includes('.ts') ? options.uri + "?q=test" : options.uri;
+        let newUri = options.uri.includes('.ts') ? options.uri : options.uri;
 
         return {
             ...options,
