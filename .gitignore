@@ -1,0 +1,8 @@
+.venv/
+venv/
+*.log
+media/videos/*
+migrations/*
+*.db
+__pycache__
+.idea
