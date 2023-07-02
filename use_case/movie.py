@@ -1,7 +1,9 @@
 import hashlib
 
+from celery_tasks.tasks import task_create_hls_files
 from repository.file import Movie
-from settings import OUTPUT_DIRECTORY
+from settings import MEDIA_DIRECTORY, MEDIA_DIRECTORY_FULL_PATH, PROJECT_DIRECTORY
+# from tasks import task_create_hls_files
 from utils.use_case_validator import CreateFileMovieValidator
 from utils.helper import mkdir, is_exist_path, join_path, generate_random_characters
 from slugify import slugify
@@ -13,26 +15,26 @@ class CreateMovie:
         self.user_id = user_id
 
     def _save_movie(self, movie_id: int):
-        save_path = join_path(OUTPUT_DIRECTORY, str(movie_id))
+        save_path = join_path(MEDIA_DIRECTORY_FULL_PATH, str(movie_id))
         if not is_exist_path(save_path):
             mkdir(save_path)
         new_file_name = f"{generate_random_characters()}{self.validator.movie_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
-        self.validator.movie_file.validated_value.filename = new_file_name
+        # self.validator.movie_file.validated_value.filename = new_file_name
         self.validator.movie_file.validated_value.save(saved_file)
         # TODO: Send to celery for ffmpeg
-        return saved_file
+        return join_path(MEDIA_DIRECTORY, f"{movie_id}/{new_file_name}")
 
     def _save_movie_thumbnail(self, movie_id: int):
-        save_path = join_path(OUTPUT_DIRECTORY, str(movie_id))
+        save_path = join_path(MEDIA_DIRECTORY_FULL_PATH, str(movie_id))
         if not is_exist_path(save_path):
             mkdir(save_path)
         new_file_name = f"thumbnail_{generate_random_characters()}{self.validator.thumbnail_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
-        self.validator.thumbnail_file.validated_value.filename = new_file_name
+        # self.validator.thumbnail_file.validated_value.filename = new_file_name
         self.validator.thumbnail_file.validated_value.save(saved_file)
         # TODO: Send to celery for ffmpeg for screen shot
-        return saved_file
+        return join_path(MEDIA_DIRECTORY, f"{movie_id}/{new_file_name}")
 
     def make_hash_value(self):
         hasher = hashlib.sha256(self.validator.movie_file.validated_value.read()).hexdigest()
@@ -83,5 +85,9 @@ class CreateMovie:
 
         hash_value = self.make_hash_value()
         existed_movie = self.checks_availability_movie_by(hash_value)
-        has_error, result = self.create_movie(hash_value, existed_movie)
-        return has_error, result
+        has_error, result_movie = self.create_movie(hash_value, existed_movie)
+        if has_error:
+            return has_error, result_movie
+        if not existed_movie:
+            task_create_hls_files.delay(result_movie.id)
+        return False, {"CREATE_MOVIE": "Successful..."}
