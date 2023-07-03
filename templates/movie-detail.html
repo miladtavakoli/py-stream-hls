@@ -221,15 +221,18 @@
 </head>
 <body>
 <div class="container">
-    <video id=my-video class="video-js vjs-default-skin " width="1024" controls>
-
+    <h1>{{movie_result.title}}</h1>
+    <h3>{{movie_result.description}}</h3>
+    <video id=my-video class="video-js vjs-default-skin "
+           data-setup='{ "poster": "{{movie_result.directory_path}}/{{movie_result.thumbnail}}" }'
+           width="1024" controls>
         <source
-                src="/movie/media/videos/livestream.m3u8"
+                src='{{movie_result.directory_path}}/{{movie_result.hls_filename}}'
                 type="application/x-mpegURL">
 
 
     </video>
-
+<h4><a href=""></a></h4>
 
     Works with both mpd and m3u8 links, uncomment the source url from the code
 </div>
@@ -363,6 +366,7 @@
                 }
             }
         });
+
     });</script>
 
 </body>

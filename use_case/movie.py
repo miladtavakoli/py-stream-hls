@@ -2,7 +2,7 @@ import hashlib
 
 from celery_tasks.tasks import task_create_hls_files
 from repository.file import Movie
-from settings import MEDIA_DIRECTORY, MEDIA_DIRECTORY_FULL_PATH, PROJECT_DIRECTORY
+from settings import MEDIA_DIRECTORY, MEDIA_DIRECTORY_FULL_PATH, PROJECT_DIRECTORY, MEDIA_VIDEO_DIRECTORY
 # from tasks import task_create_hls_files
 from utils.use_case_validator import CreateFileMovieValidator
 from utils.helper import mkdir, is_exist_path, join_path, generate_random_characters
@@ -15,26 +15,24 @@ class CreateMovie:
         self.user_id = user_id
 
     def _save_movie(self, movie_id: int):
-        save_path = join_path(MEDIA_DIRECTORY_FULL_PATH, str(movie_id))
+        save_path = join_path(MEDIA_VIDEO_DIRECTORY, str(movie_id))
         if not is_exist_path(save_path):
             mkdir(save_path)
         new_file_name = f"{generate_random_characters()}{self.validator.movie_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
-        # self.validator.movie_file.validated_value.filename = new_file_name
         self.validator.movie_file.validated_value.save(saved_file)
         # TODO: Send to celery for ffmpeg
-        return join_path(MEDIA_DIRECTORY, f"{movie_id}/{new_file_name}")
+        return new_file_name
 
     def _save_movie_thumbnail(self, movie_id: int):
-        save_path = join_path(MEDIA_DIRECTORY_FULL_PATH, str(movie_id))
+        save_path = join_path(MEDIA_VIDEO_DIRECTORY, str(movie_id))
         if not is_exist_path(save_path):
             mkdir(save_path)
         new_file_name = f"thumbnail_{generate_random_characters()}{self.validator.thumbnail_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
-        # self.validator.thumbnail_file.validated_value.filename = new_file_name
         self.validator.thumbnail_file.validated_value.save(saved_file)
         # TODO: Send to celery for ffmpeg for screen shot
-        return join_path(MEDIA_DIRECTORY, f"{movie_id}/{new_file_name}")
+        return new_file_name
 
     def make_hash_value(self):
         hasher = hashlib.sha256(self.validator.movie_file.validated_value.read()).hexdigest()
@@ -56,17 +54,17 @@ class CreateMovie:
             m = Movie.query.filter(Movie.id == m.id).first()
 
             if existed_movie is None:
-                saved_movie = self._save_movie(movie_id=m.id)
+                m.original_filename = self._save_movie(movie_id=m.id)
+                m.thumbnail = self._save_movie_thumbnail(movie_id=m.id)
+                m.directory_path = join_path(MEDIA_VIDEO_DIRECTORY, str(m.id))
             else:
-                saved_movie = existed_movie.original_filename
-            if existed_movie is None:
-                saved_thumbnail = self._save_movie_thumbnail(movie_id=m.id)
-            else:
-                saved_thumbnail = self._save_movie_thumbnail(movie_id=existed_movie.id)
-            m.original_filename = saved_movie
-            m.thumbnail = saved_thumbnail
+                m.directory_path = existed_movie.directory_path
+                m.original_filename = existed_movie.original_filename
+                m.thumbnail = self._save_movie_thumbnail(movie_id=existed_movie.id)
+                m.hls_filename = existed_movie.hls_filename
             m.save()
             result = m
+            has_error = False
         except Exception as e:
             has_error = True
             result = {"CREATE_MOVIE_ERROR": str(e)}
@@ -91,3 +89,17 @@ class CreateMovie:
         if not existed_movie:
             task_create_hls_files.delay(result_movie.id)
         return False, {"CREATE_MOVIE": "Successful..."}
+
+
+class GetMovie:
+    def __init__(self, movie_id: int, user_id: int):
+        self.user_id = user_id
+        self.movie_id = movie_id
+
+    def run(self) -> tuple[bool, Movie | dict]:
+        movie = Movie.query.filter(Movie.id == self.movie_id).first()
+        if movie is None:
+            return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
+        if movie.is_private and movie.user_id != self.user_id:
+            return True, {"msg": {"permission_error": "This movie does not belongs to you."}}
+        return False, movie

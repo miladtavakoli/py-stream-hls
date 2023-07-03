@@ -1,7 +1,8 @@
 from utils.helper import join_path
 
 PROJECT_DIRECTORY = '/home/noob/project/py_streaming'
-MEDIA_DIRECTORY = 'media/videos'
+MEDIA_DIRECTORY = 'media'
+MEDIA_VIDEO_DIRECTORY = join_path(MEDIA_DIRECTORY, 'videos')
 MEDIA_DIRECTORY_FULL_PATH = join_path(PROJECT_DIRECTORY, MEDIA_DIRECTORY)
 
 # CELERY CONFIG

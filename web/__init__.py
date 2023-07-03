@@ -11,7 +11,7 @@ db = SQLAlchemy()
 migrate = Migrate()
 flask_bcrypt = Bcrypt()
 template_dir = os.path.abspath('templates/')
-static_dir = os.path.abspath('templates/static')
+static_dir = os.path.abspath('templates/static/')
 
 from celery import Celery, Task
 
@@ -49,6 +49,8 @@ def create_app() -> Flask:
     flask_bcrypt.init_app(app)
     app.config.from_prefixed_env()
     celery_init_app(app)
+    app.static_url_path = static_dir
+
     from web.auth import auth_bp
     from web.player import movie_bp
     from web.panel import panel_bp
