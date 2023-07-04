@@ -4,223 +4,14 @@
     <meta charset="UTF-8">
     <title>videojs - quality menu with out plugins</title>
     <link rel='stylesheet' href='https://vjs.zencdn.net/7.1.0/video-js.css'>
-    <link rel="stylesheet" href="./style.css">
+    <link rel="stylesheet" href="/static/css/style.css">
     <style>
-
-        body {
-            font-family: 'Montserrat', sans-serif;
-            line-height: 1.6;
-            margin: 0;
-            min-height: 100vh;
-        }
-
-        ul {
-            margin: 0;
-            padding: 0;
-            list-style: none;
-        }
-
-
-        h2,
-        h3,
-        a {
-            color: #34495e;
-        }
-
-        a {
-            text-decoration: none;
-        }
-
-
-        .logo {
-            margin: 0;
-            font-size: 1.45em;
-        }
-
-        .main-nav {
-            margin-top: 5px;
-
-        }
-
-        .logo a,
-        .main-nav a {
-            padding: 10px 15px;
-            text-transform: uppercase;
-            text-align: center;
-            display: block;
-        }
-
-        .main-nav a {
-            color: #34495e;
-            font-size: .99em;
-        }
-
-        .main-nav a:hover {
-            color: #718daa;
-        }
-
-        .video-js button {
-            margin-top: 20%;
-            margin-left: 40%;
-        }
-
-        .header {
-            padding-top: .5em;
-            padding-bottom: .5em;
-            border: 1px solid #a2a2a2;
-            background-color: #f4f4f4;
-            -webkit-box-shadow: 0px 0px 14px 0px rgba(0, 0, 0, 0.75);
-            -moz-box-shadow: 0px 0px 14px 0px rgba(0, 0, 0, 0.75);
-            box-shadow: 0px 0px 14px 0px rgba(0, 0, 0, 0.75);
-            -webkit-border-radius: 5px;
-            -moz-border-radius: 5px;
-            border-radius: 5px;
-        }
-
-
-        /* =================================
-          Media Queries
-        ==================================== */
-
-
-        @media (min-width: 769px) {
-            .header,
-            .main-nav {
-                display: flex;
-            }
-
-            .header {
-                flex-direction: column;
-                align-items: center;
-
-            .header {
-                width: 80%;
-                margin: 0 auto;
-                max-width: 1150px;
-            }
-        }
-
-        }
-
-        @media (min-width: 1025px) {
-            .header {
-                flex-direction: row;
-                justify-content: space-between;
-            }
-
-        }
-
-        .contentMenu {
-            position: relative;
-            width: 4em;
-        }
-
-        .contentMenu .icon {
-            width: 100%;
-            bottom: 0;
-            position: absolute;
-            padding: 10px;
-            text-align: center;
-            color: white;
-        }
-
-        .contentMenu .icon:hover {
-            cursor: pointer;
-            color: gray;
-        }
-
-        .contentMenu .icon:hover + .menu {
-            transform: translate(-50%, -30px);
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .contentMenu .menu {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transition: all 200ms;
-            display: flex;
-            justify-content: center;
-            flex-direction: column-reverse;
-            width: 100px;
-            transform: translate(-50%, -20px);
-            visibility: hidden;
-            opacity: 0;
-        }
-
-        .contentMenu .menu:hover {
-            transform: translate(-50%, -30px);
-            visibility: visible;
-            opacity: 1;
-        }
-
-        .contentMenu .menu:after {
-            content: "";
-            position: absolute;
-            width: 0;
-            height: 0;
-            bottom: -15px;
-            left: calc(50% - 15px);
-            border-left: 15px solid transparent;
-            border-right: 15px solid transparent;
-            border-top: 15px solid #333;
-        }
-
-        #auto {
-            background: #333;
-        }
-
-        #auto .current {
-            font-size: 10px;
-            margin-left: 3px;
-        }
-
-        #auto .current:before {
-            margin-left: -3px;
-            content: "(";
-            position: absolute;
-        }
-
-        #auto .current:after {
-            content: ")";
-            position: absolute;
-        }
-
-        .item {
-            position: relative;
-            text-align: center;
-            border: 0;
-            padding: 10px;
-            background: #444;
-        }
-
-        .item.selected {
-            background: #333;
-            font-weight: bold;
-        }
-
-        .item.selected:before {
-            content: "";
-            position: absolute;
-            width: 10px;
-            height: 10px;
-            top: 50%;
-            border-radius: 50%;
-            background: #4caf50;
-            left: 10px;
-            transform: translateY(-50%);
-        }
-
-        .item:hover {
-            background: #333;
-            cursor: pointer;
-        }
 
     </style>
 </head>
 <body>
-<div class="container">
+ {% if not has_error %}
+ <div class="container">
     <h1>{{movie_result.title}}</h1>
     <h3>{{movie_result.description}}</h3>
     <video id=my-video class="video-js vjs-default-skin "
@@ -230,12 +21,15 @@
                 src='{{movie_result.directory_path}}/{{movie_result.hls_filename}}'
                 type="application/x-mpegURL">
 
-
     </video>
 <h4><a href="{{movie_result.directory_path}}/{{movie_result.original_filename}}">Download</a></h4>
 
     Works with both mpd and m3u8 links, uncomment the source url from the code
 </div>
+     {% else %}
+    <h1>{{movie_result['msg']}}</h1>
+     {% endif %}
+
 <!-- partial -->
 <script src='https://vjs.zencdn.net/7.2.3/video.js'></script>
 <script>
