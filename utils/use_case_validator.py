@@ -33,3 +33,10 @@ class CreateFileMovieValidator(BaseUseCaseValidator):
         self.description = ValidateMovieDescription(input_data=input_data.get('description', None))
         self.imdb_tag = ValidateMovieImdbTag(input_data=input_data.get('imdb_tag', None))
         super(CreateFileMovieValidator, self).__init__()
+
+
+class LoginUserValidator(BaseUseCaseValidator):
+    def __init__(self, input_data):
+        self.username = ValidatorUsername(input_data=input_data.get('username', None))
+        self.password = ValidatorPassword(input_data=input_data.get('password', None))
+        super(LoginUserValidator, self).__init__()

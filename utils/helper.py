@@ -1,7 +1,10 @@
 import os
 import string
 import random
+import uuid
+
 from logger import logger
+from repository.redis_mangement import RedisSession
 
 
 def mkdir(directory: str):
@@ -35,3 +38,13 @@ def splitext(file_name: str):
 def generate_random_characters(length=13):
     characters = string.ascii_letters + string.digits
     return ''.join(random.choices(characters, k=length))
+
+
+class FlaskSession:
+    def __init__(self):
+        self.repo = RedisSession()
+
+    def create_token(self, user_id):
+        token = uuid.uuid4().hex
+        self.repo.set(token, user_id)
+        return token
