@@ -6,6 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
 import settings
+from web.middleware import AuthenticationMiddleware
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -50,6 +51,7 @@ def create_app() -> Flask:
     app.config.from_prefixed_env()
     celery_init_app(app)
     app.static_url_path = static_dir
+    app.wsgi_app = AuthenticationMiddleware(app.wsgi_app)
 
     from web.auth import auth_bp
     from web.player import movie_bp

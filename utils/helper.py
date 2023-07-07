@@ -48,3 +48,11 @@ class FlaskSession:
         token = uuid.uuid4().hex
         self.repo.set(token, user_id)
         return token
+
+    def get_user_id(self, token):
+        user_id = self.repo.get(token)
+        return user_id
+
+    def revoke_token(self, token):
+        self.repo.delete(token)
+        return None

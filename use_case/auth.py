@@ -76,3 +76,12 @@ class LoginUser:
         token = FlaskSession().create_token(user_id=user.id)
 
         return False, token
+
+
+class LogoutUser:
+    def __init__(self, input_data):
+        self.input_data = input_data
+
+    def run(self) -> tuple[bool, User | dict]:
+        FlaskSession().revoke_token(self.input_data['token'])
+        return False, {"msg": "User logout successfully!"}
