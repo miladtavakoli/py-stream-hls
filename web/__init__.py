@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask import Flask
 
 import settings
-from web.middleware import AuthenticationMiddleware
+# from web.middleware import AuthenticationMiddleware
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -51,13 +51,11 @@ def create_app() -> Flask:
     app.config.from_prefixed_env()
     celery_init_app(app)
     app.static_url_path = static_dir
-    app.wsgi_app = AuthenticationMiddleware(app.wsgi_app)
+    # app.wsgi_app = AuthenticationMiddleware(app.wsgi_app)
 
     from web.auth import auth_bp
     from web.player import movie_bp
     from web.panel import panel_bp
-    from repository.user import User, Permission
-    from repository.file import Movie
     app.register_blueprint(auth_bp)
     app.register_blueprint(movie_bp)
     app.register_blueprint(panel_bp)
@@ -71,4 +69,6 @@ def create_test_app():
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///../test_app.db'
     db.init_app(app)
     migrate.init_app(app, db)
+    flask_bcrypt.init_app(app)
+    # app.wsgi_app = AuthenticationMiddleware(app.wsgi_app)
     return app

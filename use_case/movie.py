@@ -21,7 +21,6 @@ class CreateMovie:
         new_file_name = f"{generate_random_characters()}{self.validator.movie_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
         self.validator.movie_file.validated_value.save(saved_file)
-        # TODO: Send to celery for ffmpeg
         return new_file_name
 
     def _save_movie_thumbnail(self, movie_id: int):
@@ -31,7 +30,6 @@ class CreateMovie:
         new_file_name = f"thumbnail_{generate_random_characters()}{self.validator.thumbnail_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
         self.validator.thumbnail_file.validated_value.save(saved_file)
-        # TODO: Send to celery for ffmpeg for screen shot
         return new_file_name
 
     def make_hash_value(self):
@@ -88,7 +86,7 @@ class CreateMovie:
             return has_error, result_movie
         if not existed_movie:
             task_create_hls_files.delay(result_movie.id)
-        return False, {"CREATE_MOVIE": "Successful..."}
+        return False, {"msg": "Upload movie successful...", 'data': result_movie}
 
 
 class GetMovie:
