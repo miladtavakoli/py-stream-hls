@@ -100,19 +100,53 @@ class StringFieldValidator(BaseFieldValidator):
         return self.input_data
 
 
+class IntegerFieldValidator(BaseFieldValidator):
+    """
+    Class Variable:
+            min_value (int) : Optional. Checks input number has been greater than min_value. Example: 1
+            max_value (int) : Optional. Checks input Number has been lower than max_value. Example: 10
+
+    """
+
+    def __init__(self, input_data,
+                 is_required=False,
+                 min_value: int = None,
+                 max_value: int = None):
+        self.min_value = min_value
+        self.max_value = max_value
+        super().__init__(input_data=input_data, is_required=is_required)
+
+    def length_validate(self):
+        if isinstance(self.input_data, int):
+            if self.min_value is not None and self.input_data < self.min_value:
+                self._is_valid = False
+                self._errors.append(f"Must be greater than {self.min_value} .")
+
+            if self.max_value is not None and self.input_data > self.max_value:
+                self._is_valid = False
+                self._errors.append(f"Must be lower than {self.max_value} .")
+
+    def validate(self):
+        if not isinstance(self.input_data, int) and (not self.is_required and self.input_data is not None):
+            self._is_valid = False
+            self._errors.append("Is not Integer.")
+
+        for method in dir(self):
+            if callable(getattr(self, method)) and method.endswith('_validate'):
+                getattr(self, method)()
+        return self.input_data
+
+
 class FileFieldValidator(BaseFieldValidator):
     """
     Class Variable:
-        regex_pattern (str) : Optional. Checks pattern of field input. Example:  r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        min_length (int) : Optional. Checks minimum length of field input. Example: 3
-        maximum_length (str) : Optional. Checks maximum_length of field input. Example: 25
+        allowed_mime_types (list[str]) : Optional. Checks Input File has valid mime type: Example: `['video/mp4']`
     """
 
     def __init__(self, input_data,
                  is_required=False,
                  allowed_mime_types: list[str] = None):
         self.allowed_mime_types = allowed_mime_types
-        self.regex = allowed_mime_types
         super().__init__(input_data=input_data, is_required=is_required)
 
     def mime_types_validate(self):

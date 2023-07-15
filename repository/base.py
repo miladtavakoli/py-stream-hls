@@ -3,7 +3,15 @@ from datetime import datetime
 from abc import abstractmethod
 
 
+class BaseQuery(db.Query):
+    def paginate(self, page: int, per_page: int):
+        offset = (page - 1) * per_page
+        return self.limit(per_page).offset(offset)
+
+
 class BaseModel(db.Model):
+    query_class = BaseQuery
+
     __abstract__ = True
     id = db.Column(db.Integer, primary_key=True)
     created_at = db.Column(db.DateTime, default=datetime.now)

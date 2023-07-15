@@ -1,34 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>videojs - quality menu with out plugins</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"/>
+    <meta name="description" content=""/>
+    <meta name="author" content=""/>
+    <title>NooBot | نوبات</title>
+    <!-- Favicon-->
+    <link rel="icon" type="image/x-icon" href="assets/favicon.ico"/>
+    <!-- Bootstrap icons-->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel='stylesheet' href='https://vjs.zencdn.net/7.1.0/video-js.css'>
     <link rel="stylesheet" href="/static/css/style.css">
-    <style>
-
-    </style>
+    <link href="/static/css/home.css" rel="stylesheet"/>
 </head>
 <body>
- {% if not has_error %}
- <div class="container">
-    <h1>{{movie_result.title}}</h1>
-    <h3>{{movie_result.description}}</h3>
-    <video id=my-video class="video-js vjs-default-skin "
-           data-setup='{ "poster": "{{movie_result.directory_path}}/{{movie_result.thumbnail}}" }'
-           width="1024" controls>
-        <source
-                src='{{movie_result.directory_path}}/{{movie_result.hls_filename}}'
-                type="application/x-mpegURL">
+<!-- Navigation-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container px-4 px-lg-5">
+        <a class="navbar-brand" href="/">NooBot</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
+                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation"><span
+                class="navbar-toggler-icon"></span></button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-4">
+                <li class="nav-item"><a class="nav-link active" aria-current="page" href="/">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#!">About</a></li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Movies</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item" href="#!">All Movie</a></li>
+                        <li>
+                            <hr class="dropdown-divider"/>
+                        </li>
+                        <li><a class="dropdown-item" href="/auth">Login/Register</a></li>
+                        <li><a class="dropdown-item" href="#!">Play lists</a></li>
+                    </ul>
+                </li>
+            </ul>
+            <form class="d-flex">
+                <button class="btn btn-outline-dark" type="submit">
+                    <i class="bi-cart-fill me-1"></i>
+                    Cart
+                    <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</nav>
+<!-- Header-->
+<header class="bg-dark py-5">
+    <div class="container px-4 px-lg-5 my-5">
+        <div class="text-center text-white">
+            <h1 class="display-4 fw-bolder">Noob Streamer</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Start stream your video...</p>
+        </div>
+    </div>
+</header>
+{% if not has_error %}
+    <section class="py-5">
+        <div class="container px-12 px-lg-12 mt-12">
+            <div class="justify-content-center">
+                    <div class="col mb-5 col-sm-12">
+                        <div class="card">
 
-    </video>
-<h4><a href="{{movie_result.directory_path}}/{{movie_result.original_filename}}">Download</a></h4>
+                            <video id=my-video
+                                   class="video-js vjs-default-skin
+                                    justify-content-center
+                                    card-img-top card-video-padding"
+                                   data-setup='{ "poster": "{{ url_for('pages.return_manifest', file_name=movie_result.directory_path+"/"+movie_result.thumbnail ) }}" }'
+                                   width="1400"
+                                   height="100%"
+                                   controls>
+                                <source
+                                        src='{{ movie_result.directory_path }}/{{ movie_result.hls_filename }}'
+                                        type="application/x-mpegURL">
 
-    Works with both mpd and m3u8 links, uncomment the source url from the code
-</div>
-     {% else %}
-    <h1>{{movie_result['msg']}}</h1>
-     {% endif %}
+                            </video>
+                            <!-- Movie details-->
+                            <div class="card-body p-4">
+                                <div class="text-center">
+                                    <h5 class="fw-bolder">{{ movie_result.title }}</h5>
+                                    <h4>
+                                        <a href="{{ movie_result.directory_path }}/{{ movie_result.original_filename }}">Download</a>
+                                    </h4>
+
+                                    <div class="badge bg-dark text-white"
+                                         style="top: 0.5rem; right: 0.5rem">
+                                        CATEGORY
+                                    </div>
+                                    <div class="d-flex justify-content-center small text-warning mb-2">
+                                        <div class="bi-star-fill"> ***</div>
+                                        <div class="bi-star-fill"></div>
+                                        <div class="bi-star-fill"></div>
+                                        <div class="bi-star-fill"></div>
+                                        <div class="bi-star-fill"></div>
+                                    </div>
+                                    <!-- Product price-->
+                                    <span class="text-muted text-decoration-line-through">{{ movie_result.description }}</span>
+                                </div>
+                            </div>
+                            <!-- Product actions-->
+                            <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center">
+                                    <a class="btn btn-outline-dark mt-auto"
+                                       href="{{ url_for('pages.movie_detail',movie_id=movie_result.id) }}">Watch...</a></div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </section>
+{% else %}
+    <h1>{{ movie_result['msg'] }}</h1>
+{% endif %}
+
 
 <!-- partial -->
 <script src='https://vjs.zencdn.net/7.2.3/video.js'></script>

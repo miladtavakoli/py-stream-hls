@@ -1,10 +1,11 @@
 import io
 from unittest import mock
 
+from repository.file import Movie
 from test import BaseStreamTestCase, app
 from repository.user import User
 
-from use_case.movie import CreateMovie
+from use_case.movie import CreateMovie, HomeListMovie
 from werkzeug.datastructures import FileStorage
 
 
@@ -51,3 +52,34 @@ class CreateMovieUseCaseTestCase(BaseStreamTestCase):
             self.assertEqual(self.valid_movie_data['imdb_tag'], result['data'].imdb_tag)
             self.assertEqual("test.mp4", result['data'].original_filename)
             self.assertEqual("test.jpg", result['data'].thumbnail)
+
+
+class HomeListMovieUseCaseTestCase(BaseStreamTestCase):
+
+    def setUp(self):
+        super(HomeListMovieUseCaseTestCase, self).setUp()
+        self.valid_movie_data = {
+            "title": "This test Title",
+            "slug": "This-test-Title",
+            "description": "This test description... !",
+            "imdb_tag": "ttNevermind",
+            "original_filename": 'test.mp4',
+            "thumbnail": 'thumbnail.jpg',
+            "directory_path": '/tmp/1',
+            "is_private": False,
+            "user_id": 1
+        }
+
+    def test_get_successful_movies(self):
+        with app.app_context():
+            for i in range(10):
+                m = Movie(**self.valid_movie_data)
+                m.save()
+            self.valid_movie_data.update({"is_private": True})
+            for i in range(5):
+                m = Movie(**self.valid_movie_data)
+                m.save()
+
+            has_error, result = HomeListMovie({"page": 1, "per_page": 5}).run()
+            self.assertFalse(has_error)
+            self.assertEqual(5, len(result))

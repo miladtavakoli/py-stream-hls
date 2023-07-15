@@ -1,5 +1,6 @@
 from utils.validators import ValidatorUsername, ValidatorEmail, ValidatorPassword, ValidateFirstName, ValidateLastName, \
-    ValidateMovieFile, ValidateMovieThumbnailFile, ValidateMovieTitle, ValidateMovieDescription, ValidateMovieImdbTag
+    ValidateMovieFile, ValidateMovieThumbnailFile, ValidateMovieTitle, ValidateMovieDescription, ValidateMovieImdbTag, \
+    ValidatePaginationPage, ValidatePaginationPerPage, ValidateHomeSearch
 
 
 class BaseUseCaseValidator:
@@ -40,3 +41,11 @@ class LoginUserValidator(BaseUseCaseValidator):
         self.username = ValidatorUsername(input_data=input_data.get('username', None))
         self.password = ValidatorPassword(input_data=input_data.get('password', None))
         super(LoginUserValidator, self).__init__()
+
+
+class HomePageVideosValidator(BaseUseCaseValidator):
+    def __init__(self, input_data):
+        self.search = ValidateHomeSearch(input_data=input_data.get('search', None))
+        self.page = ValidatePaginationPage(input_data=input_data.get('page', None))
+        self.per_page = ValidatePaginationPerPage(input_data=input_data.get('per_page', None))
+        super(HomePageVideosValidator, self).__init__()
