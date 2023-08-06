@@ -3,7 +3,6 @@ import hashlib
 from celery_tasks.tasks import task_create_hls_files
 from repository.file import Movie
 from settings import MEDIA_DIRECTORY, MEDIA_DIRECTORY_FULL_PATH, PROJECT_DIRECTORY, MEDIA_VIDEO_DIRECTORY
-# from tasks import task_create_hls_files
 from utils.use_case_validator import CreateFileMovieValidator, HomePageVideosValidator
 from utils.helper import mkdir, is_exist_path, join_path, generate_random_characters
 from slugify import slugify
