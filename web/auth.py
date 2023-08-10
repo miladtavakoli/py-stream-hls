@@ -1,7 +1,7 @@
 from flask import Blueprint, request, render_template, send_file, make_response, url_for
 
 import settings
-from use_case.auth import LoginUser, CreateUser
+from use_case.auth import LoginUser, CreateUser, LogoutUser
 from datetime import datetime, timedelta
 
 auth_bp = Blueprint("auth", __name__, url_prefix="/auth/")
@@ -33,11 +33,6 @@ def auth_index():
         return render_template('login.html', form_display=form_display, )
 
 
-@auth_bp.route('/login', methods=["POST"])
-def login():
-    return ''
-
-
 @auth_bp.route('/sign-up', methods=["POST", "GET"])
 def sign_up():
     form_display = {
@@ -60,3 +55,15 @@ def sign_up():
         return "SIGNED UP...."
     if request.method == 'GET':
         return render_template('login.html', form_display=form_display, )
+
+
+@auth_bp.route('/logout', methods=["GET"])
+def logout():
+    input_data = {
+        "token": request.cookies.get('authentication')
+    }
+    use_case = LogoutUser(input_data)
+    use_case.run()
+    response = make_response('LoggedOut... go to home')
+    response.delete_cookie('authentication')
+    return response

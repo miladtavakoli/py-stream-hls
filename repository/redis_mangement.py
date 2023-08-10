@@ -11,6 +11,12 @@ class BaseRedis:
     def set(self, name, value):
         self.redis_connection.set(name, value, self.expire_time)
 
+    def get(self, name):
+        self.redis_connection.get(name)
+
+    def delete(self, name):
+        self.redis_connection.delete(name)
+
 
 class RedisSession(BaseRedis):
     def __init__(self):

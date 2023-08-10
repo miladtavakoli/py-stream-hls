@@ -1,4 +1,5 @@
-from utils.base_validators import StringFieldValidator, FileFieldValidator
+import settings
+from utils.base_validators import StringFieldValidator, FileFieldValidator, IntegerFieldValidator
 
 
 class ValidatorUsername(StringFieldValidator):
@@ -64,3 +65,21 @@ class ValidateMovieImdbTag(StringFieldValidator):
     def __init__(self, input_data):
         super(ValidateMovieImdbTag, self).__init__(input_data=input_data, is_required=False,
                                                    min_length=10, max_length=600)
+
+
+class ValidateHomeSearch(StringFieldValidator):
+    def __init__(self, input_data):
+        super(ValidateHomeSearch, self).__init__(input_data=input_data, is_required=False,
+                                                  min_length=2, max_length=300)
+
+
+class ValidatePaginationPage(IntegerFieldValidator):
+    def __init__(self, input_data):
+        super(ValidatePaginationPage, self).__init__(input_data=input_data, is_required=False,
+                                                     min_value=1)
+
+
+class ValidatePaginationPerPage(IntegerFieldValidator):
+    def __init__(self, input_data):
+        super(ValidatePaginationPerPage, self).__init__(input_data=input_data, is_required=False,
+                                                        min_value=1, max_value=settings.PAGINATION_PER_PAGE)

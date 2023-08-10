@@ -3,8 +3,7 @@ import hashlib
 from celery_tasks.tasks import task_create_hls_files
 from repository.file import Movie
 from settings import MEDIA_DIRECTORY, MEDIA_DIRECTORY_FULL_PATH, PROJECT_DIRECTORY, MEDIA_VIDEO_DIRECTORY
-# from tasks import task_create_hls_files
-from utils.use_case_validator import CreateFileMovieValidator
+from utils.use_case_validator import CreateFileMovieValidator, HomePageVideosValidator
 from utils.helper import mkdir, is_exist_path, join_path, generate_random_characters
 from slugify import slugify
 
@@ -21,7 +20,6 @@ class CreateMovie:
         new_file_name = f"{generate_random_characters()}{self.validator.movie_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
         self.validator.movie_file.validated_value.save(saved_file)
-        # TODO: Send to celery for ffmpeg
         return new_file_name
 
     def _save_movie_thumbnail(self, movie_id: int):
@@ -31,7 +29,6 @@ class CreateMovie:
         new_file_name = f"thumbnail_{generate_random_characters()}{self.validator.thumbnail_file.file_extension}"
         saved_file = join_path(save_path, new_file_name)
         self.validator.thumbnail_file.validated_value.save(saved_file)
-        # TODO: Send to celery for ffmpeg for screen shot
         return new_file_name
 
     def make_hash_value(self):
@@ -88,7 +85,7 @@ class CreateMovie:
             return has_error, result_movie
         if not existed_movie:
             task_create_hls_files.delay(result_movie.id)
-        return False, {"CREATE_MOVIE": "Successful..."}
+        return False, {"msg": "Upload movie successful...", 'data': result_movie}
 
 
 class GetMovie:
@@ -103,3 +100,20 @@ class GetMovie:
         if movie.is_private and movie.user_id != self.user_id:
             return True, {"msg": {"permission_error": "This movie does not belongs to you."}}
         return False, movie
+
+
+class HomeListMovie:
+    def __init__(self, input_data):
+        self.validator = HomePageVideosValidator(input_data)
+
+    def run(self) -> tuple[bool, Movie | dict]:
+        if not self.validator.is_valid:
+            has_error = True
+            errors = self.validator.errors
+            return has_error, errors
+
+        movies = Movie.query.filter(Movie.is_private == False).paginate(self.validator.page.validated_value,
+                                                                        self.validator.per_page.validated_value).all()
+        if movies is None:
+            return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
+        return False, movies

@@ -1,5 +1,7 @@
 import os
 import subprocess
+
+from ffmpeg_lib.ffmpeg import Ffmpeg, OverlayText
 from logger import logger
 from utils.helper import is_exist_path, mkdir, join_path
 from settings import MEDIA_DIRECTORY, MEDIA_DIRECTORY_FULL_PATH
@@ -31,5 +33,13 @@ def create_hls_files(input_video_path: str, output_folder: str = MEDIA_DIRECTORY
     subprocess.call(command, shell=True)
     return "noob_stream.m3u8"
 
-if __name__ == "__main__":
-    create_hls_files(input_video_path="media/videos/00-intro.mp4", output_folder="tmp")
+
+def run_ffmpeg(input_video_path: str, output_folder: str = MEDIA_DIRECTORY):
+    f = Ffmpeg(input_file=input_video_path)
+    f.output_dir = output_folder
+    f.output_filename = 'noobstream'
+    f.hls_time = 10
+    f.overlay_text = OverlayText("noob_streamer.ir")
+    f.run()
+    return f"{f.output_filename}.m3u8"
+
