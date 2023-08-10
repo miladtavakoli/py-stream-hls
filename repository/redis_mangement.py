@@ -1,9 +1,11 @@
+from abc import ABC
+
 from redis import Redis
 
 import settings
 
 
-class BaseRedis:
+class BaseRedis(ABC):
     def __init__(self, db: int, expire_time):
         self.redis_connection = Redis(host=settings.REDIS_URL, port=settings.REDIS_PORT, db=db)
         self.expire_time = expire_time
@@ -12,7 +14,7 @@ class BaseRedis:
         self.redis_connection.set(name, value, self.expire_time)
 
     def get(self, name):
-        self.redis_connection.get(name)
+        return self.redis_connection.get(name)
 
     def delete(self, name):
         self.redis_connection.delete(name)

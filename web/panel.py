@@ -1,10 +1,12 @@
 from flask import Blueprint, request, render_template, send_file, url_for
 from use_case.movie import CreateMovie
+from utils.decorator import authentication
 
 panel_bp = Blueprint("panel", __name__, url_prefix="/panel/")
 
 
 @panel_bp.route('/upload', methods=['GET', 'POST'])
+@authentication
 def upload_movie():
     if request.method == 'POST':
         input_data = {

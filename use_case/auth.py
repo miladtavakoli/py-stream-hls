@@ -1,4 +1,5 @@
 from repository.user import User
+from utils.exceptions import ValidatorInputRequired, ClassInitializingException
 from utils.helper import FlaskSession
 from utils.use_case_validator import CreateUserUseCaseValidator, LoginUserValidator
 from flask_bcrypt import generate_password_hash, check_password_hash
@@ -85,3 +86,28 @@ class LogoutUser:
     def run(self) -> tuple[bool, User | dict]:
         FlaskSession().revoke_token(self.input_data['token'])
         return False, {"msg": "User logout successfully!"}
+
+
+class GetUser:
+    def __init__(self, user_id: int = None, username: str = None):
+        if user_id is None and username is None:
+            raise ClassInitializingException("username or user_id is required.")
+        self.user_id = user_id
+        self.username = username
+
+    def get_user_by_user_id(self) -> tuple[bool, User | dict]:
+        user = User.query.filter(User.id == self.user_id).first()
+        if user is None:
+            return True, {"msg": "User Not Found"}
+        return False, user
+
+    def get_user_by_username(self) -> tuple[bool, User | dict]:
+        user = User.query.filter(User.username == self.username).first()
+        if user is None:
+            return True, {"msg": "User Not Found"}
+        return False, user
+
+    def run(self) -> tuple[bool, User | dict]:
+        if self.user_id is not None:
+            return self.get_user_by_user_id()
+        return self.get_user_by_user_id()

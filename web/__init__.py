@@ -3,10 +3,13 @@ import os.path
 from flask_bcrypt import Bcrypt
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from flask import Flask
+from flask import Flask, request, g
+
+from utils.helper import FlaskSession
+
+
 
 import settings
-# from web.middleware import AuthenticationMiddleware
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -51,7 +54,14 @@ def create_app() -> Flask:
     app.config.from_prefixed_env()
     celery_init_app(app)
     app.static_url_path = static_dir
-    # app.wsgi_app = AuthenticationMiddleware(app.wsgi_app)
+
+    # app.wsgi_app = AuthenticationMiddleware(app, app.wsgi_app)
+    @app.before_request
+    def before_request():
+        token = request.cookies.get('authentication', None)
+        user_id = FlaskSession().get_user_id(token) if token is not None else None
+        g.user_id = int(user_id)
+        print(g.user_id)
 
     from web.auth import auth_bp
     from web.pages import pages_bp
