@@ -66,3 +66,10 @@ class UpdateUserPasswordUseCaseValidator(BaseUseCaseValidator):
         self.new_password = ValidatorPassword(input_data=input_data.get('new_password', None))
         super(UpdateUserPasswordUseCaseValidator, self).__init__()
 
+
+class MyVideosValidator(BaseUseCaseValidator):
+    def __init__(self, input_data):
+        self.search = ValidateHomeSearch(input_data=input_data.get('search', None))
+        self.page = ValidatePaginationPage(input_data=input_data.get('page', None))
+        self.per_page = ValidatePaginationPerPage(input_data=input_data.get('per_page', None))
+        super(MyVideosValidator, self).__init__()
