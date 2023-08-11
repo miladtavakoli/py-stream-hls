@@ -1,7 +1,8 @@
 from repository.user import User
 from utils.exceptions import ValidatorInputRequired, ClassInitializingException
 from utils.helper import FlaskSession
-from utils.use_case_validator import CreateUserUseCaseValidator, LoginUserValidator, UpdateUserUseCaseValidator
+from utils.use_case_validator import CreateUserUseCaseValidator, LoginUserValidator, UpdateUserUseCaseValidator, \
+    UpdateUserPasswordUseCaseValidator
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 
@@ -124,13 +125,12 @@ class UpdateUserProfile:
     def update_user(self) -> tuple[bool, User | dict]:
         has_error = False
         try:
-            u = User.query.filter(User.id == self.user.id).first()
-            u.username = self.validator.username.validated_value.lower()
-            u.email = self.validator.email.validated_value
-            u.first_name = self.validator.first_name.validated_value
-            u.last_name = self.validator.last_name.validated_value
-            u.save()
-            result = u
+            self.user.username = self.validator.username.validated_value.lower()
+            self.user.email = self.validator.email.validated_value
+            self.user.first_name = self.validator.first_name.validated_value
+            self.user.last_name = self.validator.last_name.validated_value
+            self.user.save()
+            result = self.user
         except Exception as e:
             has_error = True
             result = {"msg": str(e)}
@@ -166,4 +166,34 @@ class UpdateUserProfile:
         has_error, create_user_result = self.update_user()
         if has_error:
             return has_error, create_user_result
+        return False, None
+
+
+class UpdateUserPassword:
+    def __init__(self, input_data, user):
+        self.validator = UpdateUserPasswordUseCaseValidator(input_data)
+        self.user = user
+
+    def update_password(self) -> tuple[bool, User | dict]:
+        has_error = False
+        try:
+            self.user.password = generate_password_hash(self.validator.new_password.validated_value, 10).decode('utf-8')
+            self.user.save()
+            result = self.user
+        except Exception as e:
+            has_error = True
+            result = {"msg": str(e)}
+        return has_error, result
+
+    def is_password_match(self) -> bool:
+        return check_password_hash(self.user.password.encode('utf8'), self.validator.old_password.validated_value)
+
+    def run(self) -> tuple[bool, dict | None]:
+        if not self.validator.is_valid:
+            return True, self.validator.errors
+        if not self.is_password_match():
+            return True, {"msg": "Old password is incorrect"}
+        has_error, update_password_result = self.update_password()
+        if has_error:
+            return has_error, update_password_result
         return False, None

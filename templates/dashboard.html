@@ -37,13 +37,16 @@
         button {
             width: 100%;
             padding: 12px;
-            background-color: #79a6fa;
+            background-color: #0c1b36;
             color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             font-size: 18px;
             transition: background-color 0.2s ease-in-out;
+        }
+        button:hover{
+            background-color: #334864;
         }
 
         .form-group {
@@ -131,61 +134,118 @@
 <!-- Section-->
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
-        <div class="row">
-            <h3 style="margin: 20px;">Profile</h3>
-            <div class="container card" style="padding: 20px;">
-                {% if has_error == True %}
-                    <div class="alert alert-danger" role="alert">
-                        {% if errors.get('msg') %}
-                            {{ errors.get('msg') }}
-                        {% else %}
-                            <ul>
-                                {% for key,errors in errors.items() %}
-                                    <B>
-                                        <li>{{ key.title() }}</li>
-                                    </B>
-                                    <ul style="padding-left: 10px;">
-                                        {% for error in errors %}
-                                            <li>{{ error }}</li>
-                                        {% endfor %}
-
-                                    </ul>
+        {% if has_error == True %}
+            <div class="alert alert-danger" role="alert">
+                {% if errors.get('msg') %}
+                    {{ errors.get('msg') }}
+                {% else %}
+                    <ul>
+                        {% for key,errors in errors.items() %}
+                            <B>
+                                <li>{{ key.title() }}</li>
+                            </B>
+                            <ul style="padding-left: 10px;">
+                                {% for error in errors %}
+                                    <li>{{ error }}</li>
                                 {% endfor %}
+
                             </ul>
-                        {% endif %}
-
-                    </div>
-                    {% elif has_error == False %}
-                     <div class="alert alert-success" role="alert">
-                     <span> Update Profile Successful.</span>
-                     </div>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
-                <form method="POST" enctype="multipart/form-data" action="{{ url_for("dashboard.profile") }}">
-                    <div class="form-group">
-                        <label for="firstName">FirstName: </label>
-                        <input type="text" class="form-control-text" id="firstName" name="firstName"
-                               value="{{ user.first_name if user.first_name != None else "" }}">
-                        <br>
-                        <label for="lastName">LastName: </label>
-                        <input type="text" class="form-control-text" id="lastName" name="lastName"
-                               value="{{ user.last_name if user.last_name != None else "" }}">
-                        <br>
-                        <label for="userName">Username: </label>
-                        <input type="text" class="form-control-text" id="userName" name="userName"
-                               required value="{{ user.username }}">
-                        <br>
-                        <label for="email">Email: </label><br>
-                        <input type="text" class="form-control-text" id="email" name="email"
-                               required value="{{ user.email }}">
-                        <br>
-                        <button type="submit">Submit</button>
 
-                    </div>
-                </form>
+            </div>
+        {% elif has_error == False %}
+            <div class="alert alert-success" role="alert">
+                <span> Updated Successful.</span>
+            </div>
+        {% endif %}
+        <div class="d-flex align-items-start">
+            <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <button class="nav-link active" id="v-pills-profile-tab" data-bs-toggle="pill"
+                        data-bs-target="#v-pills-profile" type="button" role="tab" aria-controls="v-pills-profile"
+                        aria-selected="true">Profile
+                </button>
+                <button class="nav-link" id="v-pills-password-tab" data-bs-toggle="pill"
+                        data-bs-target="#v-pills-password" type="button" role="tab" aria-controls="v-pills-password"
+                        aria-selected="false">Password
+                </button>
+                <button class="nav-link" id="v-pills-messages-tab" data-bs-toggle="pill"
+                        data-bs-target="#v-pills-messages" type="button" role="tab" aria-controls="v-pills-messages"
+                        aria-selected="false">Messages
+                </button>
+                <button class="nav-link" id="v-pills-settings-tab" data-bs-toggle="pill"
+                        data-bs-target="#v-pills-settings" type="button" role="tab" aria-controls="v-pills-settings"
+                        aria-selected="false">Settings
+                </button>
             </div>
 
+            <!-- Tab panes -->
+            <div class="tab-content" id="v-pills-tabContent">
+                <div class="tab-pane fade {{ "show active" if tab == "profile" else "" }}"
+                     id="v-pills-profile" role="tabpanel"
+                     aria-labelledby="v-pills-profile-tab">
+                    <div class="container card" style="padding: 20px;">
+                        <form method="POST" enctype="multipart/form-data" action="{{ url_for("dashboard.profile") }}">
+                            <div class="form-group">
+                                <label for="firstName">FirstName: </label>
+                                <input type="text" class="form-control-text" id="firstName" name="firstName"
+                                       value="{{ user.first_name if user.first_name != None else "" }}">
+                                <br>
+                                <label for="lastName">LastName: </label>
+                                <input type="text" class="form-control-text" id="lastName" name="lastName"
+                                       value="{{ user.last_name if user.last_name != None else "" }}">
+                                <br>
+                                <label for="userName">Username: </label>
+                                <input type="text" class="form-control-text" id="userName" name="userName"
+                                       required value="{{ user.username }}">
+                                <br>
+                                <label for="email">Email: </label><br>
+                                <input type="text" class="form-control-text" id="email" name="email"
+                                       required value="{{ user.email }}">
+                                <br>
+                                <button type="submit">Submit</button>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade {{ "show active" if tab == "password"else "" }}"
+                     id="v-pills-password" role="tabpanel" aria-labelledby="v-pills-password-tab">
+                    <div class="container card" style="padding: 20px;">
+
+                        <form method="POST" enctype="multipart/form-data"
+                              action="{{ url_for("dashboard.change_password") }}">
+                            <div class="form-group">
+                                <label for="oldPassword">Old Password: </label>
+                                <input type="password" class="form-control-text" id="oldPassword" name="oldPassword">
+                                <br>
+                                <label for="newPassword">New Password: </label>
+                                <input type="password" class="form-control-text" id="newPassword" name="newPassword">
+                                <br>
+                                <button type="submit">Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="v-pills-messages" role="tabpanel" aria-labelledby="v-pills-messages-tab">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci aspernatur at atque commodi
+                    corporis doloremque eaque earum eligendi impedit ipsum iure odio quibusdam quisquam, reiciendis, rem
+                    repellendus sapiente sed velit?
+                </div>
+                <div class="tab-pane fade" id="v-pills-settings" role="tabpanel" aria-labelledby="v-pills-settings-tab">
+                    Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cum cumque deserunt dicta dignissimos
+                    exercitationem laboriosam maxime minus quas qui quibusdam. Earum magni nesciunt perspiciatis! Ad
+                    corporis deleniti quod vero voluptatum.
+                </div>
+            </div>
+
+
+            <div class="row">
+
+            </div>
         </div>
-    </div>
 </section>
 <!-- Footer-->
 <footer class="py-5 bg-dark my-footer">

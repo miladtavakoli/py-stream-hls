@@ -59,3 +59,10 @@ class UpdateUserUseCaseValidator(BaseUseCaseValidator):
         self.last_name = ValidateLastName(input_data=input_data.get('last_name', None))
         super(UpdateUserUseCaseValidator, self).__init__()
 
+
+class UpdateUserPasswordUseCaseValidator(BaseUseCaseValidator):
+    def __init__(self, input_data):
+        self.old_password = ValidatorPassword(input_data=input_data.get('old_password', None))
+        self.new_password = ValidatorPassword(input_data=input_data.get('new_password', None))
+        super(UpdateUserPasswordUseCaseValidator, self).__init__()
+
