@@ -49,3 +49,13 @@ class HomePageVideosValidator(BaseUseCaseValidator):
         self.page = ValidatePaginationPage(input_data=input_data.get('page', None))
         self.per_page = ValidatePaginationPerPage(input_data=input_data.get('per_page', None))
         super(HomePageVideosValidator, self).__init__()
+
+
+class UpdateUserUseCaseValidator(BaseUseCaseValidator):
+    def __init__(self, input_data):
+        self.username = ValidatorUsername(input_data=input_data.get('username', None))
+        self.email = ValidatorEmail(input_data=input_data.get('email', None))
+        self.first_name = ValidateFirstName(input_data=input_data.get('first_name', None))
+        self.last_name = ValidateLastName(input_data=input_data.get('last_name', None))
+        super(UpdateUserUseCaseValidator, self).__init__()
+

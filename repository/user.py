@@ -13,7 +13,6 @@ class User(BaseModel):
     is_active = db.Column(db.Boolean, default=True)
     movies = db.relationship("Movie", back_populates='user')
 
-
     def __repr__(self):
         return f"<User: {self.username}>"
 

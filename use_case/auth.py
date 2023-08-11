@@ -1,7 +1,7 @@
 from repository.user import User
 from utils.exceptions import ValidatorInputRequired, ClassInitializingException
 from utils.helper import FlaskSession
-from utils.use_case_validator import CreateUserUseCaseValidator, LoginUserValidator
+from utils.use_case_validator import CreateUserUseCaseValidator, LoginUserValidator, UpdateUserUseCaseValidator
 from flask_bcrypt import generate_password_hash, check_password_hash
 
 
@@ -50,8 +50,11 @@ class CreateUser:
         has_error, errors = self.check_unique_fields()
         if has_error:
             return True, errors
-        has_error, result = self.create_user()
-        return has_error, result
+        has_error, create_user_result = self.create_user()
+        if has_error:
+            return has_error, create_user_result
+        token = FlaskSession().create_token(user_id=create_user_result.id)
+        return False, token
 
 
 class LoginUser:
@@ -111,3 +114,56 @@ class GetUser:
         if self.user_id is not None:
             return self.get_user_by_user_id()
         return self.get_user_by_user_id()
+
+
+class UpdateUserProfile:
+    def __init__(self, input_data, user):
+        self.validator = UpdateUserUseCaseValidator(input_data)
+        self.user = user
+
+    def update_user(self) -> tuple[bool, User | dict]:
+        has_error = False
+        try:
+            u = User.query.filter(User.id == self.user.id).first()
+            u.username = self.validator.username.validated_value.lower()
+            u.email = self.validator.email.validated_value
+            u.first_name = self.validator.first_name.validated_value
+            u.last_name = self.validator.last_name.validated_value
+            u.save()
+            result = u
+        except Exception as e:
+            has_error = True
+            result = {"msg": str(e)}
+        return has_error, result
+
+    def is_existed_username(self) -> bool:
+        u = User.query.filter(User.username ==
+                              self.validator.username.validated_value.lower()).filter(User.id != self.user.id).first()
+        return u is not None
+
+    def is_existed_email(self) -> bool:
+        u = User.query.filter(User.email ==
+                              self.validator.email.validated_value.lower()).filter(User.id != self.user.id).first()
+        return u is not None
+
+    def check_unique_fields(self) -> tuple[bool, dict]:
+        errors = {}
+        has_error = False
+        if self.is_existed_username():
+            has_error = True
+            errors.update({"Username": ["Choose another username. Username has taken."]})
+        if self.is_existed_email():
+            has_error = True
+            errors.update({"Email": ["Choose another email. Email has taken."]})
+        return has_error, errors
+
+    def run(self) -> tuple[bool, dict | None]:
+        if not self.validator.is_valid:
+            return True, self.validator.errors
+        has_error, errors = self.check_unique_fields()
+        if has_error:
+            return True, errors
+        has_error, create_user_result = self.update_user()
+        if has_error:
+            return has_error, create_user_result
+        return False, None

@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, send_file, make_response, url_for
+from flask import Blueprint, request, render_template, redirect, make_response, url_for
 
 import settings
 from use_case.auth import LoginUser, CreateUser, LogoutUser
@@ -25,7 +25,7 @@ def auth_index():
             return make_response(render_template('login.html', form_display=form_display,
                                                  has_error=has_error,
                                                  errors=result))
-        response = make_response("SIGNED UP....")
+        response = make_response(redirect(url_for("pages.home")))
         expire_time = datetime.now() + timedelta(seconds=settings.AUTHORIZATION_EXPIRE_TIME)
         response.set_cookie('authentication', result, expires=expire_time)
         return response
@@ -52,9 +52,12 @@ def sign_up():
             return make_response(render_template('login.html', form_display=form_display,
                                                  has_error=has_error,
                                                  errors=result))
-        return "SIGNED UP...."
+        response = make_response(redirect(url_for("pages.home")))
+        expire_time = datetime.now() + timedelta(seconds=settings.AUTHORIZATION_EXPIRE_TIME)
+        response.set_cookie('authentication', result, expires=expire_time)
+        return response
     if request.method == 'GET':
-        return render_template('login.html', form_display=form_display, )
+        return render_template('login.html', form_display=form_display )
 
 
 @auth_bp.route('/logout', methods=["GET"])
@@ -64,6 +67,6 @@ def logout():
     }
     use_case = LogoutUser(input_data)
     use_case.run()
-    response = make_response('LoggedOut... go to home')
+    response = make_response(redirect(url_for("pages.home")))
     response.delete_cookie('authentication')
     return response

@@ -28,20 +28,20 @@
 
                 {% if user != None %}
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">Account</a>
-                       <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <li><a class="dropdown-item"href="/panel">Panel</a></li>
+                    <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+                       data-bs-toggle="dropdown" aria-expanded="false">Account</a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <li><a class="dropdown-item"href="/dashboard">{{ user.username }}</a></li>
                         <li><hr class="dropdown-divider"/></li>
-                        <li><a class="dropdown-item active" href="/panel/upload">Upload</a></li>
+                        <li><a class="dropdown-item active" href={{ url_for("dashboard.upload_movie") }}>Upload</a></li>
                         <li><hr class="dropdown-divider"/></li>
                         <li><a class="dropdown-item" href="#!" >Play lists</a></li>
                         <li><hr class="dropdown-divider"/></li>
-                        <li><a class="dropdown-item" style="color:red" href="/auth/logout" >Logout</a></li>
+                        <li><a class="dropdown-item" style="color: red" href={{ url_for("auth.logout") }} >Logout</a></li>
                     </ul>
-                    </li>
+                </li>
                 {% else %}
-                    <li class="nav-item"><a class="nav-link" href="/panel">Login/Register</a></li>
+                   <li class="nav-item"><a class="nav-link" href={{ url_for("auth.auth_index") }}>Login/Register</a></li>
 
                 {% endif %}
                 <li class="nav-item dropdown">

@@ -64,10 +64,10 @@ def create_app() -> Flask:
 
     from web.auth import auth_bp
     from web.pages import pages_bp
-    from web.panel import panel_bp
+    from web.dashboard import dashboard_bp
     app.register_blueprint(auth_bp)
     app.register_blueprint(pages_bp)
-    app.register_blueprint(panel_bp)
+    app.register_blueprint(dashboard_bp)
 
     return app
 
