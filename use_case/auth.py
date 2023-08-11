@@ -91,7 +91,7 @@ class LogoutUser:
 class GetUser:
     def __init__(self, user_id: int = None, username: str = None):
         if user_id is None and username is None:
-            raise ClassInitializingException("username or user_id is required.")
+            return "username or user_id is required"
         self.user_id = user_id
         self.username = username
 

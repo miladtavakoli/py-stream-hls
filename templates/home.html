@@ -36,18 +36,16 @@
                        data-bs-toggle="dropdown" aria-expanded="false">Account</a>
                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <li><a class="dropdown-item"href="/panel">Panel</a></li>
-                        <li>
-                            <hr class="dropdown-divider"/>
-                        </li>
+                        <li><hr class="dropdown-divider"/></li>
                         <li><a class="dropdown-item" href="/panel/upload">Upload</a></li>
-                        <li>
-                            <hr class="dropdown-divider"/>
-                        </li>
-                        <li><a class="dropdown-item" href="#!">Play lists</a></li>
+                        <li><hr class="dropdown-divider"/></li>
+                        <li><a class="dropdown-item" href="#!" >Play lists</a></li>
+                        <li><hr class="dropdown-divider"/></li>
+                        <li><a class="dropdown-item" href="/auth/logout" >Logout</a></li>
                     </ul>
                 </li>
                 {% else %}
-                   <li class="nav-item"><a class="nav-link" href="/panel">Login/Register</a></li>
+                   <li class="nav-item"><a class="nav-link" href="/auth/">Login/Register</a></li>
 
                 {% endif %}
                 <li class="nav-item dropdown">

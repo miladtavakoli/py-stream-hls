@@ -12,7 +12,8 @@ def home():
         'per_page': PAGINATION_PER_PAGE,
         'page': int(request.args.get('page', 1))
     }
-    has_error, user_result = GetUser(user_id=g.user_id).run()
+    has_error, user_result = GetUser(user_id=g.user_id).run() if g.user_id else True, None
+
     user = user_result if not has_error else None
     has_error, result = HomeListMovie(input_data).run()
     render = render_template('home.html', has_error=has_error, result=result, user=user)

@@ -60,8 +60,7 @@ def create_app() -> Flask:
     def before_request():
         token = request.cookies.get('authentication', None)
         user_id = FlaskSession().get_user_id(token) if token is not None else None
-        g.user_id = int(user_id)
-        print(g.user_id)
+        g.user_id = int(user_id) if user_id is not None else None
 
     from web.auth import auth_bp
     from web.pages import pages_bp
