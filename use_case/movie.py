@@ -3,9 +3,10 @@ import hashlib
 from celery_tasks.tasks import task_create_hls_files
 from repository.file import Movie
 from settings import MEDIA_DIRECTORY, MEDIA_DIRECTORY_FULL_PATH, PROJECT_DIRECTORY, MEDIA_VIDEO_DIRECTORY
-from utils.use_case_validator import CreateFileMovieValidator, HomePageVideosValidator
+from utils.use_case_validator import CreateFileMovieValidator, HomePageVideosValidator, MyVideosValidator
 from utils.helper import mkdir, is_exist_path, join_path, generate_random_characters
 from slugify import slugify
+from sqlalchemy import desc
 
 
 class CreateMovie:
@@ -112,8 +113,10 @@ class HomeListMovie:
             errors = self.validator.errors
             return has_error, errors
 
-        movies = Movie.query.filter(Movie.is_private == False).paginate(self.validator.page.validated_value,
-                                                                        self.validator.per_page.validated_value).all()
+        movies = Movie.query.filter(Movie.is_private == False).order_by(desc(Movie.created_at)).paginate(
+            self.validator.page.validated_value,
+            self.validator.per_page.validated_value).all()
         if movies is None:
             return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
         return False, movies
+
