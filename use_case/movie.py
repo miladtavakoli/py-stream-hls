@@ -120,3 +120,21 @@ class HomeListMovie:
             return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
         return False, movies
 
+
+class MyListMovie:
+    def __init__(self, input_data, user):
+        self.validator = MyVideosValidator(input_data)
+        self.user = user
+
+    def run(self) -> tuple[bool, Movie | dict]:
+        if not self.validator.is_valid:
+            has_error = True
+            errors = self.validator.errors
+            return has_error, errors
+
+        movies = Movie.query.filter(Movie.user_id == self.user.id).order_by(desc(Movie.created_at)).paginate(
+            self.validator.page.validated_value,
+            self.validator.per_page.validated_value).all()
+        if movies is None:
+            return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
+        return False, movies
