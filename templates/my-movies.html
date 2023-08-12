@@ -35,7 +35,8 @@
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">Account</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="/dashboard">{{ user.username }}</a></li>
+                            <li><a class="dropdown-item"
+                                   href="{{ url_for("dashboard.profile") }}">{{ user.username }}</a></li>
                             <li>
                                 <hr class="dropdown-divider"/>
                             </li>
@@ -43,7 +44,7 @@
                             <li>
                                 <hr class="dropdown-divider"/>
                             </li>
-                            <li><a class="dropdown-item" href={{ url_for("dashboard.my_movies") }}>My Movies</a>
+                            <li><a class="dropdown-item active" href={{ url_for("dashboard.my_movies") }}>My Movies</a>
                             </li>
                             <li>
                                 <hr class="dropdown-divider"/>
@@ -96,6 +97,15 @@
 <section class="py-5">
     <div class="container px-4 px-lg-5 mt-5">
         <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-2 row-cols-xl-3 justify-content-center" id="content">
+            {% if has_error == True %}
+                <div class="alert alert-dark" role="alert">
+                    {% if result.get('msg') %}
+                        {{ result.get('msg') }}
+                    {% endif %}
+
+                </div>
+            {% endif %}
+        {% if has_error == False %}
             {% for movie in result %}
                 <div class="col mb-5 col-sm-12">
                     <div class="card h-100">
@@ -133,11 +143,16 @@
                                 <a class="btn btn-outline-dark mt-auto"
                                    href="{{ url_for('pages.movie_detail',movie_id=movie.id) }}">Watch...</a></div>
                         </div>
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="text-center">
+                                <a class="btn btn-outline-dark mt-auto"
+                                   href="{{ url_for('pages.movie_detail',movie_id=movie.id) }}">Watch...</a></div>
+                        </div>
                     </div>
                 </div>
             {% endfor %}
             <div id="pagination" style="display: none;">{{ pagination }}</div>
-
+        {% endif %}
         </div>
     </div>
 </section>
@@ -147,7 +162,43 @@
 </footer>
 <!-- Bootstrap core JS-->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="/static/js/infinity_scroll.js"></script>
+<script>
+
+    $(document).ready(function () {
+        var isLoading = false;
+        var page = 2;
+        var pagination = $('#pagination').html();
+
+        function loadMoreMyMovies() {
+            if (isLoading) return;
+            isLoading = true;
+
+            $.ajax({
+                url: "{{ url_for('dashboard.load_my_videos') }}",
+                type: 'GET',
+                data: {page: page},
+                success: function (data) {
+                    if (data.len_items > 0) {
+                        $('#content').append(data.html);
+                        page++;
+                        isLoading = false;
+                    } else {
+                        $(window).off('scroll', onScroll);
+                    }
+                }
+            });
+        }
+
+        function onScroll() {
+            if ($(window).scrollTop() + $(window).height() >= $(document).height() - 100) {
+                loadMoreMyMovies();
+            }
+        }
+
+        $(window).on('scroll', onScroll);
+        loadMoreMyMovies();
+    });
+</script>
 
 <!-- Core theme JS-->
 </body>

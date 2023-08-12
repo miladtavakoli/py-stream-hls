@@ -97,9 +97,9 @@ class GetMovie:
     def run(self) -> tuple[bool, Movie | dict]:
         movie = Movie.query.filter(Movie.id == self.movie_id).first()
         if movie is None:
-            return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
+            return True, {"msg": "There is no movie here."}
         if movie.is_private and movie.user_id != self.user_id:
-            return True, {"msg": {"permission_error": "This movie does not belongs to you."}}
+            return True, {"msg": "This movie does not belongs to you."}
         return False, movie
 
 
@@ -117,7 +117,7 @@ class HomeListMovie:
             self.validator.page.validated_value,
             self.validator.per_page.validated_value).all()
         if movies is None:
-            return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
+            return True, {"msg": "There is no movie here."}
         return False, movies
 
 
@@ -135,6 +135,6 @@ class MyListMovie:
         movies = Movie.query.filter(Movie.user_id == self.user.id).order_by(desc(Movie.created_at)).paginate(
             self.validator.page.validated_value,
             self.validator.per_page.validated_value).all()
-        if movies is None:
-            return True, {"msg": {"MOVIE_NOTFOUND": "There is no movie here."}}
+        if len(movies) == 0:
+            return True, {"msg": "There is no movie here."}
         return False, movies

@@ -45,7 +45,8 @@
             font-size: 18px;
             transition: background-color 0.2s ease-in-out;
         }
-        button:hover{
+
+        button:hover {
             background-color: #334864;
         }
 
@@ -79,11 +80,17 @@
                         <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                            data-bs-toggle="dropdown" aria-expanded="false">Account</a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item active" href="/dashboard">{{ user.username }}</a></li>
+                            <li><a class="dropdown-item active"
+                                   href="{{ url_for("dashboard.profile") }}">{{ user.username }}</a></li>
                             <li>
                                 <hr class="dropdown-divider"/>
                             </li>
                             <li><a class="dropdown-item" href={{ url_for("dashboard.upload_movie") }}>Upload</a></li>
+                            <li>
+                                <hr class="dropdown-divider"/>
+                            </li>
+                            <li><a class="dropdown-item" href={{ url_for("dashboard.my_movies") }}>My Movies</a>
+                            </li>
                             <li>
                                 <hr class="dropdown-divider"/>
                             </li>

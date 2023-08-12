@@ -17,7 +17,7 @@ def authentication(func):
                 g.current_user = res
                 return func(*args, **kwargs)
             raise AuthenticationRequired("User should be logged in...")
-        except Exception as e:
+        except AuthenticationRequired as e:
             logger.error(e)
             raise AuthenticationRequired("User should be logged in...")
     return decorated
